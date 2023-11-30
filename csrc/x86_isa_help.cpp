@@ -56,7 +56,13 @@ __forceinline void read_cpuidex(
   *p_edx = reg_data[3];
 }
 
-bool check_avx2_feature()
+
+void check_feature_via_cpuid(bool &bit_fma, 
+  bool &bit_avx2, 
+  bool &bit_avx512_f,
+  bool &bit_avx512_vl,
+  bool &bit_avx512_bw,
+  bool &bit_avx512_dq)
 {
   uint32_t eax = 0;
   uint32_t ebx = 0;
@@ -78,14 +84,6 @@ bool check_avx2_feature()
   read_cpuid(0x80000000, &eax, &ebx, &ecx, &edx);
   uint32_t max_extend_id = eax;
 
-  bool bit_fma;
-  bool bit_avx2 = false;
-
-  bool bit_avx512_f = false;
-  bool bit_avx512_vl = false;
-  bool bit_avx512_bw = false;
-  bool bit_avx512_dq = false;
-
   if (max_basic_id >= 0x00000001) {
     read_cpuidex(0x00000001, 0, &eax, &ebx, &ecx, &edx);
 
@@ -104,33 +102,26 @@ bool check_avx2_feature()
     bit_avx512_bw = check_reg_bit(ebx, 30);
     bit_avx512_dq = check_reg_bit(ebx, 17);
   }
+}
+
+bool check_avx2_feature()
+{
+  bool bit_fma = false;
+  bool bit_avx2 = false;
+
+  bool bit_avx512_f = false;
+  bool bit_avx512_vl = false;
+  bool bit_avx512_bw = false;
+  bool bit_avx512_dq = false;
+
+  check_feature_via_cpuid(bit_fma, bit_avx2, bit_avx512_f, bit_avx512_vl, bit_avx512_bw, bit_avx512_dq);
 
   return (bit_fma && bit_avx2);
 }
 
 bool check_avx512_feature()
 {
-  uint32_t eax = 0;
-  uint32_t ebx = 0;
-  uint32_t ecx = 0;
-  uint32_t edx = 0;
-  /*
-  Initial version reference from:
-  ----------------------------------------------------
-  Intel® Architecture
-  Instruction Set Extensions
-  and Future Features
-  Programming Reference
-  May 2021
-  319433-044
-  */
-  read_cpuid(0, &eax, &ebx, &ecx, &edx);
-  uint32_t max_basic_id = eax;
-
-  read_cpuid(0x80000000, &eax, &ebx, &ecx, &edx);
-  uint32_t max_extend_id = eax;
-
-  bool bit_fma;
+  bool bit_fma = false;
   bool bit_avx2 = false;
 
   bool bit_avx512_f = false;
@@ -138,24 +129,7 @@ bool check_avx512_feature()
   bool bit_avx512_bw = false;
   bool bit_avx512_dq = false;
 
-  if (max_basic_id >= 0x00000001) {
-    read_cpuidex(0x00000001, 0, &eax, &ebx, &ecx, &edx);
-
-    bit_fma = check_reg_bit(ecx, 12);
-  }
-
-  if (max_basic_id >= 0x00000007) {
-    uint32_t max_sub_leaf = 0;
-    read_cpuidex(0x00000007, 0, &eax, &ebx, &ecx, &edx);
-    max_sub_leaf = eax;
-
-    bit_avx2 = check_reg_bit(ebx, 5);
-
-    bit_avx512_f = check_reg_bit(ebx, 16);
-    bit_avx512_vl = check_reg_bit(ebx, 31);
-    bit_avx512_bw = check_reg_bit(ebx, 30);
-    bit_avx512_dq = check_reg_bit(ebx, 17);
-  }
+  check_feature_via_cpuid(bit_fma, bit_avx2, bit_avx512_f, bit_avx512_vl, bit_avx512_bw, bit_avx512_dq);
 
   return (bit_fma && bit_avx512_f && 
   bit_avx512_vl && bit_avx512_bw && bit_avx512_dq);
