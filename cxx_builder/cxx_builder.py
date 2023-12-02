@@ -72,6 +72,17 @@ class CxxCudaOptions(CxxTorchOptions):
         super().__init__()
         _nonduplicate_append(self._cflags, ["DCUDA"])
 
+class CxxBuilder():
+    def __init__(self, name, sources, BuildOptionsBase) -> None:
+        pass
+
+    def get_command_line(self) -> str:
+        return ""
+    
+    def build(self):
+        return
+
+
 cxx_cfg = CxxOptions()
 print(cxx_cfg.get_cflags())
 
