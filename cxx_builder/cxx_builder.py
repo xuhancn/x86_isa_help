@@ -6,8 +6,12 @@ _IS_LINUX = sys.platform.startswith('linux')
 _IS_MACOS = sys.platform.startswith('darwin')
 _IS_WINDOWS = sys.platform == 'win32'
 
+def _nonduplicate_append(dest_list: list, src_list: list):
+    for i in src_list:
+        if not i in dest_list:
+            dest_list.append(i)
+
 class BuildOptionsBase(object):
-    '''
     _definations = []
     _include_dirs = []
     _cflags = []
@@ -15,56 +19,45 @@ class BuildOptionsBase(object):
     _libraries_dirs = []
     _libraries = []
     _passthough_parameters = []
-    '''
+
     def __init__(self) -> None:
         pass
 
     def get_definations(self) -> List[str]:
-        raise NotImplementedError()
+        raise self._definations
     
     def get_include_dirs(self) -> List[str]:
-        raise NotImplementedError()    
+        raise self._include_dirs
 
     def get_cflags(self) -> List[str]:
-        raise NotImplementedError()
+        return self._cflags
     
     def get_ldlags(self) -> List[str]:
-        raise NotImplementedError()
+        raise self._ldlags
     
     def get_libraries_dirs(self) -> List[str]:
-        raise NotImplementedError()
+        raise self.get_libraries_dirs
     
     def get_libraries(self) -> List[str]:
-        raise NotImplementedError()
+        raise self.get_libraries
     
     def get_passthough_parameters(self) -> List[str]:
-        raise NotImplementedError()
+        raise self.get_passthough_parameters
 
 class CxxOptions(BuildOptionsBase):
     def __init__(self) -> None:
-        super().__init__()        
-
-    def get_cflags(self):
-        cflags = ["O2", "NDEBUG"]
-        return cflags
+        super().__init__()
+        _nonduplicate_append(self._cflags, ["O3", "NDEBUG"])
     
 class CxxTorchOptions(CxxOptions):
     def __init__(self) -> None:
         super().__init__()
-
-    def get_cflags(self):
-        cflags = super().get_cflags()
-        cflags.append("DTORCH")
-        return cflags
+        _nonduplicate_append(self._cflags, ["DTORCH"])
     
 class CxxCudaOptions(CxxTorchOptions):
     def __init__(self) -> None:
         super().__init__()
-
-    def get_cflags(self):
-        cflags = super().get_cflags()
-        cflags.append("DCUDA")
-        return cflags
+        _nonduplicate_append(self._cflags, ["DCUDA"])
 
 cxx_cfg = CxxOptions()
 print(cxx_cfg.get_cflags())
