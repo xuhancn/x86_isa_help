@@ -1,10 +1,18 @@
 import sys
 from typing import Dict, List
+import os
 
 # initialize variables for compilation
 _IS_LINUX = sys.platform.startswith('linux')
 _IS_MACOS = sys.platform.startswith('darwin')
 _IS_WINDOWS = sys.platform == 'win32'
+
+def _get_cxx_compiler():
+    if _IS_WINDOWS:
+        compiler = os.environ.get('CXX', 'cl')
+    else:
+        compiler = os.environ.get('CXX', 'c++')
+    return compiler
 
 def _nonduplicate_append(dest_list: list, src_list: list):
     for i in src_list:
@@ -12,6 +20,7 @@ def _nonduplicate_append(dest_list: list, src_list: list):
             dest_list.append(i)
 
 class BuildOptionsBase(object):
+    _compiler = ""
     _definations = []
     _include_dirs = []
     _cflags = []
@@ -22,6 +31,9 @@ class BuildOptionsBase(object):
 
     def __init__(self) -> None:
         pass
+
+    def get_compiler(self) -> str:
+        return self._compiler
 
     def get_definations(self) -> List[str]:
         return self._definations
@@ -47,6 +59,7 @@ class BuildOptionsBase(object):
 class CxxOptions(BuildOptionsBase):
     def __init__(self) -> None:
         super().__init__()
+        self._compiler = _get_cxx_compiler()
         _nonduplicate_append(self._cflags, ["O3", "NDEBUG"])
     
 class CxxTorchOptions(CxxOptions):
