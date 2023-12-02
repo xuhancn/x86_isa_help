@@ -1,4 +1,5 @@
 import sys
+from typing import Dict, List
 
 # initialize variables for compilation
 _IS_LINUX = sys.platform.startswith('linux')
@@ -6,36 +7,46 @@ _IS_MACOS = sys.platform.startswith('darwin')
 _IS_WINDOWS = sys.platform == 'win32'
 
 class BuildOptionsBase(object):
+    '''
+    _definations = []
+    _include_dirs = []
+    _cflags = []
+    _ldlags = []
+    _libraries_dirs = []
+    _libraries = []
+    _passthough_parameters = []
+    '''
     def __init__(self) -> None:
         pass
 
-    def get_definations(self):
+    def get_definations(self) -> List[str]:
         raise NotImplementedError()
     
-    def get_include_dirs(self):
+    def get_include_dirs(self) -> List[str]:
         raise NotImplementedError()    
 
-    def get_cflags(self):
+    def get_cflags(self) -> List[str]:
         raise NotImplementedError()
     
-    def get_ldlags(self):
+    def get_ldlags(self) -> List[str]:
         raise NotImplementedError()
     
-    def get_libraries_dirs(self):
+    def get_libraries_dirs(self) -> List[str]:
         raise NotImplementedError()
     
-    def get_libraries(self):
+    def get_libraries(self) -> List[str]:
         raise NotImplementedError()
     
-    def get_passthough_parameters(self):
+    def get_passthough_parameters(self) -> List[str]:
         raise NotImplementedError()
 
 class CxxOptions(BuildOptionsBase):
     def __init__(self) -> None:
-        super().__init__()
+        super().__init__()        
 
     def get_cflags(self):
-        return ["O2", "NDEBUG"]
+        cflags = ["O2", "NDEBUG"]
+        return cflags
     
 class CxxTorchOptions(CxxOptions):
     def __init__(self) -> None:
