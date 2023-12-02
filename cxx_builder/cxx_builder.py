@@ -24,25 +24,25 @@ class BuildOptionsBase(object):
         pass
 
     def get_definations(self) -> List[str]:
-        raise self._definations
+        return self._definations
     
     def get_include_dirs(self) -> List[str]:
-        raise self._include_dirs
+        return self._include_dirs
 
     def get_cflags(self) -> List[str]:
         return self._cflags
     
     def get_ldlags(self) -> List[str]:
-        raise self._ldlags
+        return self._ldlags
     
     def get_libraries_dirs(self) -> List[str]:
-        raise self.get_libraries_dirs
+        return self.get_libraries_dirs
     
     def get_libraries(self) -> List[str]:
-        raise self.get_libraries
+        return self.get_libraries
     
     def get_passthough_parameters(self) -> List[str]:
-        raise self.get_passthough_parameters
+        return self.get_passthough_parameters
 
 class CxxOptions(BuildOptionsBase):
     def __init__(self) -> None:
