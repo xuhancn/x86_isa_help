@@ -89,20 +89,24 @@ class BuildOptionsBase(object):
         return self._passthough_args
 
 class CxxOptions(BuildOptionsBase):
+    def _get_shared_cflag(self):
+        SHARED_FLAG = 'DLL' if _IS_WINDOWS else 'shared'
+        return SHARED_FLAG    
     def __init__(self) -> None:
         super().__init__()
         self._compiler = _get_cxx_compiler()
         _nonduplicate_append(self._cflags, ["O3"])
+        _nonduplicate_append(self._cflags, [self._get_shared_cflag()])
     
 class CxxTorchOptions(CxxOptions):
     def __init__(self) -> None:
         super().__init__()
-        _nonduplicate_append(self._cflags, ["DTORCH"])
+        #_nonduplicate_append(self._cflags, ["DTORCH"])
     
 class CxxCudaOptions(CxxTorchOptions):
     def __init__(self) -> None:
         super().__init__()
-        _nonduplicate_append(self._cflags, ["DCUDA"])
+        #_nonduplicate_append(self._cflags, ["DCUDA"])
 
 class CxxBuilder():
     _compiler = ""
@@ -122,11 +126,16 @@ class CxxBuilder():
         SHARED_LIB_EXT = '.dll' if _IS_WINDOWS else '.so'
         return SHARED_LIB_EXT    
 
-    def __init__(self, name: str, sources, output_dir: str, BuildOption: BuildOptionsBase) -> None:
+    def __init__(self, name, sources, BuildOption: BuildOptionsBase, output_dir = None) -> None:
         self._name = name
         self._sources_args = " ".join(sources)
-        self._output_dir = output_dir
-        self._target_file = os.path.join(output_dir, f"{self._name}{self.get_shared_lib_ext()}")
+        
+        if output_dir is None:
+            self._output_dir = os.path.dirname(os.path.abspath(__file__))
+        else:
+            self._output_dir = output_dir
+
+        self._target_file = os.path.join(self._output_dir, f"{self._name}{self.get_shared_lib_ext()}")
 
         self._compiler = BuildOption.get_compiler()
 
@@ -201,5 +210,5 @@ cxx_build_options = CxxOptions()
 cpu_build_options = CxxTorchOptions()
 cuda_build_options = CxxCudaOptions()
 
-x86_isa_help_builder = CxxBuilder("x86_isa_help", ["../csrc/x86_isa_help.cpp"], "",cxx_build_options)
+x86_isa_help_builder = CxxBuilder("x86_isa_help", ["../../csrc/x86_isa_help.cpp"], cxx_build_options)
 x86_isa_help_builder.build()
