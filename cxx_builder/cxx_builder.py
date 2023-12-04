@@ -27,7 +27,7 @@ class BuildOptionsBase(object):
     _ldlags = []
     _libraries_dirs = []
     _libraries = []
-    _passthough_parameters = []
+    _passthough_args = []
 
     def __init__(self) -> None:
         pass
@@ -48,13 +48,13 @@ class BuildOptionsBase(object):
         return self._ldlags
     
     def get_libraries_dirs(self) -> List[str]:
-        return self.get_libraries_dirs
+        return self._libraries_dirs
     
     def get_libraries(self) -> List[str]:
-        return self.get_libraries
+        return self._libraries
     
-    def get_passthough_parameters(self) -> List[str]:
-        return self.get_passthough_parameters
+    def get_passthough_args(self) -> List[str]:
+        return self._passthough_args
 
 class CxxOptions(BuildOptionsBase):
     def __init__(self) -> None:
@@ -73,8 +73,56 @@ class CxxCudaOptions(CxxTorchOptions):
         _nonduplicate_append(self._cflags, ["DCUDA"])
 
 class CxxBuilder():
-    def __init__(self, name, sources, BuildOptionsBase) -> None:
-        pass
+    _compiler = ""
+    _cflags_args = ""
+    _definations_args = ""
+    _include_dirs_args = ""
+    _ldlags_args = ""
+    _libraries_dirs_args = ""
+    _libraries_args = ""
+    _passthough_parameters_args = ""
+
+    def __init__(self, name, sources, BuildOption: BuildOptionsBase) -> None:
+        self._compiler = BuildOption.get_compiler()
+
+        for cflag in BuildOption.get_cflags():
+            if _IS_WINDOWS:
+                self._cflags_args += (f"/{cflag} ")
+            else:
+                self._cflags_args += (f"-{cflag} ")
+
+        for defination in BuildOption.get_definations():
+            if _IS_WINDOWS:
+                self._definations_args +=  (f"/D {defination} ")
+            else:
+                self._definations_args +=  (f"-D{defination} ")
+
+        for inc_dir in BuildOption.get_include_dirs():
+            if _IS_WINDOWS:
+                self._include_dirs_args += (f"/I {inc_dir} ")
+            else:
+                self._include_dirs_args += (f"-I{inc_dir} ")
+        
+        for ldflag in BuildOption.get_ldlags():
+            if _IS_WINDOWS:
+                self._ldlags_args += (f"/{ldflag} ")
+            else:    
+                self._ldlags_args += (f"-{ldflag} ")
+        
+        for lib_dir in BuildOption.get_libraries_dirs():
+            if _IS_WINDOWS:
+                self._libraries_dirs_args += (f"/LIBPATH:{lib_dir} ")
+            else:
+                self._libraries_dirs_args += (f"-L{lib_dir} ")
+
+        for lib in BuildOption.get_libraries():
+            if _IS_WINDOWS:
+                self._libraries_args += (f"{lib}.lib ")
+            else:
+                self._libraries_args += (f"-l{lib} ")
+
+        for passthough_arg in BuildOption.get_passthough_args():
+            self._passthough_parameters_args += (f"{passthough_arg}")
 
     def get_command_line(self) -> str:
         return ""
@@ -91,3 +139,5 @@ print(cpu_cfg.get_cflags())
 
 cuda_cfg = CxxCudaOptions()
 print(cuda_cfg.get_cflags())
+
+builder = CxxBuilder("x86_isa_help", ["../csrc/x86_isa_help.cpp"], cxx_cfg)
