@@ -82,7 +82,13 @@ class CxxBuilder():
     _libraries_args = ""
     _passthough_parameters_args = ""
 
+    _name = ""
+    _sources_args = ""
+
     def __init__(self, name, sources, BuildOption: BuildOptionsBase) -> None:
+        self._name = name
+        self._sources_args = " ".join(sources)
+
         self._compiler = BuildOption.get_compiler()
 
         for cflag in BuildOption.get_cflags():
@@ -128,16 +134,13 @@ class CxxBuilder():
         return ""
     
     def build(self):
+        build_cmd = self.get_command_line()
         return
 
 
 cxx_cfg = CxxOptions()
-print(cxx_cfg.get_cflags())
-
 cpu_cfg = CxxTorchOptions()
-print(cpu_cfg.get_cflags())
-
 cuda_cfg = CxxCudaOptions()
-print(cuda_cfg.get_cflags())
 
 builder = CxxBuilder("x86_isa_help", ["../csrc/x86_isa_help.cpp"], cxx_cfg)
+builder.build()
