@@ -104,7 +104,7 @@ void check_feature_via_cpuid(bool &bit_fma,
   }
 }
 
-bool check_avx2_feature()
+extern "C" bool check_avx2_feature()
 {
   bool bit_fma = false;
   bool bit_avx2 = false;
@@ -119,7 +119,7 @@ bool check_avx2_feature()
   return (bit_fma && bit_avx2);
 }
 
-bool check_avx512_feature()
+extern "C" bool check_avx512_feature()
 {
   bool bit_fma = false;
   bool bit_avx2 = false;

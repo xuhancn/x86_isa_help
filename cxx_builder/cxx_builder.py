@@ -210,6 +210,3 @@ class CxxBuilder():
 cxx_build_options = CxxOptions()
 cpu_build_options = CxxTorchOptions()
 cuda_build_options = CxxCudaOptions()
-
-x86_isa_help_builder = CxxBuilder("x86_isa_help", ["../../csrc/x86_isa_help.cpp"], cxx_build_options)
-x86_isa_help_builder.build()
