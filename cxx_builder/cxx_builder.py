@@ -89,14 +89,15 @@ class BuildOptionsBase(object):
         return self._passthough_args
 
 class CxxOptions(BuildOptionsBase):
-    def _get_shared_cflag(self):
-        SHARED_FLAG = 'DLL' if _IS_WINDOWS else 'shared'
-        return SHARED_FLAG    
+    def _get_shared_cflag(self) -> List[str]:
+        SHARED_FLAG = ['DLL'] if _IS_WINDOWS else ['shared', 'fPIC']
+        return SHARED_FLAG
+    
     def __init__(self) -> None:
         super().__init__()
         self._compiler = _get_cxx_compiler()
         _nonduplicate_append(self._cflags, ["O3"])
-        _nonduplicate_append(self._cflags, [self._get_shared_cflag()])
+        _nonduplicate_append(self._cflags, self._get_shared_cflag())
     
 class CxxTorchOptions(CxxOptions):
     def __init__(self) -> None:
@@ -122,11 +123,11 @@ class CxxBuilder():
     _sources_args = ""
     _output_dir = ""
     _target_file = ""
-    def get_shared_lib_ext(self):
+    def get_shared_lib_ext(self) -> str:
         SHARED_LIB_EXT = '.dll' if _IS_WINDOWS else '.so'
         return SHARED_LIB_EXT    
 
-    def __init__(self, name, sources, BuildOption: BuildOptionsBase, output_dir = None) -> None:
+    def __init__(self, name: str, sources: List[str], BuildOption: BuildOptionsBase, output_dir: str = None) -> None:
         self._name = name
         self._sources_args = " ".join(sources)
         
