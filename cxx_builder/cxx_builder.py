@@ -1,6 +1,13 @@
 import sys
 from typing import Dict, List
 import os
+import errno
+from pathlib import Path
+import shlex
+import subprocess
+
+# Windows need setup a temp dir to store .obj files.
+_BUILD_TEMP_DIR = "CxxBuild"
 
 # initialize variables for compilation
 _IS_LINUX = sys.platform.startswith('linux')
@@ -18,6 +25,31 @@ def _nonduplicate_append(dest_list: list, src_list: list):
     for i in src_list:
         if not i in dest_list:
             dest_list.append(i)
+
+def _create_if_dir_not_exist(path_dir):
+    if not os.path.exists(path_dir):
+        try:
+            Path(path_dir).mkdir(parents=True, exist_ok=True)
+        except OSError as exc:  # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise RuntimeError("Fail to create path {}".format(path_dir))
+            
+def _remove_dir(path_dir):
+    if os.path.exists(path_dir):
+        for root, dirs, files in os.walk(path_dir, topdown=False):
+            for name in files:
+                file_path = os.path.join(root, name)
+                os.remove(file_path)
+            for name in dirs:
+                dir_path = os.path.join(root, name)
+                os.rmdir(dir_path)
+        os.rmdir(path_dir)
+
+def run_command_line(cmd_line, cwd=None):
+    cmd = shlex.split(cmd_line)
+    status = subprocess.call(cmd, cwd=cwd, stderr=subprocess.STDOUT)
+    
+    return status
 
 class BuildOptionsBase(object):
     _compiler = ""
@@ -60,7 +92,7 @@ class CxxOptions(BuildOptionsBase):
     def __init__(self) -> None:
         super().__init__()
         self._compiler = _get_cxx_compiler()
-        _nonduplicate_append(self._cflags, ["O3", "NDEBUG"])
+        _nonduplicate_append(self._cflags, ["O3"])
     
 class CxxTorchOptions(CxxOptions):
     def __init__(self) -> None:
@@ -84,10 +116,17 @@ class CxxBuilder():
 
     _name = ""
     _sources_args = ""
+    _output_dir = ""
+    _target_file = ""
+    def get_shared_lib_ext(self):
+        SHARED_LIB_EXT = '.dll' if _IS_WINDOWS else '.so'
+        return SHARED_LIB_EXT    
 
-    def __init__(self, name, sources, BuildOption: BuildOptionsBase) -> None:
+    def __init__(self, name: str, sources, output_dir: str, BuildOption: BuildOptionsBase) -> None:
         self._name = name
         self._sources_args = " ".join(sources)
+        self._output_dir = output_dir
+        self._target_file = os.path.join(output_dir, f"{self._name}{self.get_shared_lib_ext()}")
 
         self._compiler = BuildOption.get_compiler()
 
@@ -131,16 +170,36 @@ class CxxBuilder():
             self._passthough_parameters_args += (f"{passthough_arg}")
 
     def get_command_line(self) -> str:
-        return ""
+        def format_build_command(compiler, sources, include_dirs_args, definations_args, cflags_args, ldflags_args, libraries_args, libraries_dirs_args, passthougn_args, target_file):
+            if _IS_WINDOWS:
+                # https://learn.microsoft.com/en-us/cpp/build/walkthrough-compile-a-c-program-on-the-command-line?view=msvc-1704
+                # https://stackoverflow.com/a/31566153
+                cmd = f"{compiler} {include_dirs_args} {definations_args} {cflags_args} {sources} {ldflags_args} {libraries_args} {libraries_dirs_args} {passthougn_args} /LD /Fe{target_file}"
+                cmd = cmd.replace("\\", "\\\\")
+            else:
+                cmd = f"{compiler} {include_dirs_args} {sources} {definations_args} {cflags_args} {ldflags_args} {libraries_args} {libraries_dirs_args} {passthougn_args} -o {target_file}"
+            return cmd
+        
+        command_line = format_build_command(compiler=self._compiler, sources=self._sources_args, include_dirs_args=self._include_dirs_args, definations_args=self._definations_args,
+                                            cflags_args=self._cflags_args, ldflags_args=self._ldlags_args, libraries_args=self._libraries_args, libraries_dirs_args=self._libraries_dirs_args,
+                                            passthougn_args=self._passthough_parameters_args, target_file=self._target_file)
+        return command_line
     
     def build(self):
+        _create_if_dir_not_exist(self._output_dir)
+        _build_tmp_dir = os.path.join(self._output_dir, _BUILD_TEMP_DIR)
+        _create_if_dir_not_exist(_build_tmp_dir)
+
         build_cmd = self.get_command_line()
+        run_command_line(build_cmd, cwd=_build_tmp_dir)
+
+        _remove_dir(_build_tmp_dir)
         return
 
 
-cxx_cfg = CxxOptions()
-cpu_cfg = CxxTorchOptions()
-cuda_cfg = CxxCudaOptions()
+cxx_build_options = CxxOptions()
+cpu_build_options = CxxTorchOptions()
+cuda_build_options = CxxCudaOptions()
 
-builder = CxxBuilder("x86_isa_help", ["../csrc/x86_isa_help.cpp"], cxx_cfg)
-builder.build()
+x86_isa_help_builder = CxxBuilder("x86_isa_help", ["../csrc/x86_isa_help.cpp"], "",cxx_build_options)
+x86_isa_help_builder.build()

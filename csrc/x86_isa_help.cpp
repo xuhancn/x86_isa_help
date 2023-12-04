@@ -7,7 +7,7 @@
 #include <intrin.h>
 #endif
 
-#include <torch/extension.h>
+//#include <torch/extension.h>
 
 /* get value from bits [n:m] */
 #define BIT_M_TO_N(x, m, n) ((uint32_t)(x << (31 - (n))) >> ((31 - (n)) + (m)))
@@ -135,6 +135,7 @@ bool check_avx512_feature()
   bit_avx512_vl && bit_avx512_bw && bit_avx512_dq);
 }
 
+#if 0
 PYBIND11_MODULE(x86_isa_help, m) {
   m.def(
       "check_avx2_feature",
@@ -145,3 +146,4 @@ PYBIND11_MODULE(x86_isa_help, m) {
       &check_avx512_feature,
       "check current whether support avx512");
 }
+#endif
