@@ -131,7 +131,7 @@ class CxxTorchOptions(CxxOptions):
         super().__init__()
         #_nonduplicate_append(self._cflags, ["DTORCH"])
     
-class CxxCudaOptions(CxxTorchOptions):
+class CxxTorchCudaOptions(CxxTorchOptions):
     '''
     This class is inherited from CxxTorchOptions, which automatic contains
     base cxx build options and torch common build options. And then it will
@@ -240,5 +240,5 @@ class CxxBuilder():
 
 
 cxx_build_options = CxxOptions()
-cpu_build_options = CxxTorchOptions()
-cuda_build_options = CxxCudaOptions()
+torch_build_options = CxxTorchOptions()
+cuda_build_options = CxxTorchCudaOptions()
