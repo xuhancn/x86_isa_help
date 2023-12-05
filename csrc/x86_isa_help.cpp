@@ -3,8 +3,10 @@
 #if defined(__GNUC__)
 #include <cpuid.h>
 #define __forceinline __attribute__((always_inline)) inline
+#define EXTERN_DLL_EXPORT extern "C"
 #elif defined(_MSC_VER)
 #include <intrin.h>
+#define EXTERN_DLL_EXPORT extern "C" __declspec(dllexport)
 #endif
 
 //#include <torch/extension.h>
@@ -104,7 +106,7 @@ void check_feature_via_cpuid(bool &bit_fma,
   }
 }
 
-extern "C" bool check_avx2_feature()
+EXTERN_DLL_EXPORT bool check_avx2_feature()
 {
   bool bit_fma = false;
   bool bit_avx2 = false;
@@ -119,7 +121,7 @@ extern "C" bool check_avx2_feature()
   return (bit_fma && bit_avx2);
 }
 
-extern "C" bool check_avx512_feature()
+EXTERN_DLL_EXPORT bool check_avx512_feature()
 {
   bool bit_fma = false;
   bool bit_avx2 = false;

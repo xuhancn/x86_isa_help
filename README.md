@@ -14,3 +14,7 @@ Current code status:
 > 1. Write a cxx_builder can jit build the cpp code. It is much faster than pytorch cpp_extension.
 > 2. Use ctypes to replace pybuild11.
 > 3. It works on Linux.
+
+## 2023/12/5
+Status:
+> 1. It works on Windows also.

@@ -96,7 +96,7 @@ class CxxOptions(BuildOptionsBase):
     def __init__(self) -> None:
         super().__init__()
         self._compiler = _get_cxx_compiler()
-        _nonduplicate_append(self._cflags, ["O3"])
+        _nonduplicate_append(self._cflags, ["O2"])
         _nonduplicate_append(self._cflags, self._get_shared_cflag())
     
 class CxxTorchOptions(CxxOptions):
