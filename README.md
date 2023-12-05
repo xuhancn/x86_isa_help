@@ -19,3 +19,6 @@ Current code status:
 Status:
 > 1. It works on Windows also.
 > 2. Add some design guide.
+> 3. Add demo snapshot to readme.
+
+<img src="images/demo.png" width="800px">
