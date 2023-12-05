@@ -24,7 +24,7 @@ Status:
 <img src="images/demo.png" width="800px">
 
 ## Build speed compared between 'ctypes' and 'cpp_extension load'
-ctypes:
+ctypes: ca6def05c2814869e748c68800a0a12a6c6dd9f7
 ```cmd
 (xu_pytorch) xu@xu-21HW:~/github/x86_isa_help$ time python x86_isa.py
 !!! x86 isa --> avx2: True, avx512: False
@@ -33,7 +33,7 @@ real    0m0.088s
 user    0m0.063s
 sys     0m0.020s
 ```
-cpp_extension load:
+cpp_extension load: 95b328ba9bf7a78188ea5bba8ba7853dfb706d6d
 ```cmd
 (xu_pytorch) xu@xu-21HW:~/github/x86_isa_help$ time python x86_isa.py
 Using /home/xu/.cache/torch_extensions/py310_cpu as PyTorch extensions root...
