@@ -2,13 +2,16 @@
 import platform
 import sys
 import os
-import glob
 import ctypes
 sys.path.append('cxx_builder')
 from cxx_builder import cxx_build_options, CxxBuilder
 
 def build_helper():
-    if platform.machine() !=  "x86_64":
+    Arch = platform.machine()
+    '''
+    Arch value is x86_64 on Linux, and the value is AMD64 on Windows.
+    '''
+    if Arch !=  "x86_64" and Arch != "AMD64":
         return
 
     cur_dir = os.path.dirname(os.path.abspath(__file__))
