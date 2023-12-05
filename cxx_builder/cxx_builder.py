@@ -52,6 +52,11 @@ def run_command_line(cmd_line, cwd=None):
     return status
 
 class BuildOptionsBase(object):
+    '''
+    This is the Base class for store cxx build options, as a template.
+    Acturally, to build a cxx shared library. We just need to select a compiler
+    and maintains the suitable args.
+    '''
     _compiler = ""
     _definations = []
     _include_dirs = []
@@ -89,6 +94,18 @@ class BuildOptionsBase(object):
         return self._passthough_args
 
 class CxxOptions(BuildOptionsBase):
+    '''
+    This class is inherited from BuildOptionsBase, and as cxx build options.
+    This option need contains basic cxx build option, which contains:
+    1. OS related args.
+    2. Toolchains related args.
+    3. Cxx standard related args.
+    Note:
+    1. According to the base class __init__ function would be called when each
+    child class instances created. We need use _nonduplicate_append to avoid
+    duplicate args append.
+    2. This Options is good for assist modules build, such as x86_isa_help.
+    '''
     def _get_shared_cflag(self) -> List[str]:
         SHARED_FLAG = ['DLL'] if _IS_WINDOWS else ['shared', 'fPIC']
         return SHARED_FLAG
@@ -100,11 +117,26 @@ class CxxOptions(BuildOptionsBase):
         _nonduplicate_append(self._cflags, self._get_shared_cflag())
     
 class CxxTorchOptions(CxxOptions):
+    '''
+    This class is inherited from CxxTorchOptions, which automatic contains
+    base cxx build options. And then it will maintains torch related build
+    args.
+    1. Torch include directories.
+    2. Torch libraries.
+    3. Torch libraries directories.
+    4. Torch MACROs.
+    5. MISC
+    '''
     def __init__(self) -> None:
         super().__init__()
         #_nonduplicate_append(self._cflags, ["DTORCH"])
     
 class CxxCudaOptions(CxxTorchOptions):
+    '''
+    This class is inherited from CxxTorchOptions, which automatic contains
+    base cxx build options and torch common build options. And then it will
+    maintains cuda device related build args.
+    '''
     def __init__(self) -> None:
         super().__init__()
         #_nonduplicate_append(self._cflags, ["DCUDA"])
@@ -201,10 +233,10 @@ class CxxBuilder():
         _create_if_dir_not_exist(_build_tmp_dir)
 
         build_cmd = self.get_command_line()
-        run_command_line(build_cmd, cwd=_build_tmp_dir)
+        status = run_command_line(build_cmd, cwd=_build_tmp_dir)
 
         _remove_dir(_build_tmp_dir)
-        return
+        return status, self._target_file
 
 
 cxx_build_options = CxxOptions()

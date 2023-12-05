@@ -16,13 +16,10 @@ def build_helper():
 
     cur_dir = os.path.dirname(os.path.abspath(__file__))
     x86_isa_help_builder = CxxBuilder("x86_isa_help", [os.path.join(cur_dir, "csrc", "x86_isa_help.cpp")], cxx_build_options, cur_dir)
-    x86_isa_help_builder.build()
-
-    file_ext = x86_isa_help_builder.get_shared_lib_ext()
-    libfile = os.path.join(cur_dir, f'x86_isa_help{file_ext}')
+    status, target_file = x86_isa_help_builder.build()
 
     # 1. open the shared library
-    isa_help_lib = ctypes.CDLL(libfile)
+    isa_help_lib = ctypes.CDLL(target_file)
 
     # 2. tell Python the argument and result types of function
     isa_help_lib.check_avx2_feature.restype = ctypes.c_bool

@@ -18,3 +18,4 @@ Current code status:
 ## 2023/12/5
 Status:
 > 1. It works on Windows also.
+> 2. Add some design guide.
