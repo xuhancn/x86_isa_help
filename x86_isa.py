@@ -6,7 +6,7 @@ import ctypes
 sys.path.append('cxx_builder')
 from cxx_builder import cxx_build_options, CxxBuilder
 
-def build_helper():
+def x86_isa_checker():
     Arch = platform.machine()
     '''
     Arch value is x86_64 on Linux, and the value is AMD64 on Windows.
@@ -34,4 +34,4 @@ def build_helper():
     print("!!! x86 isa --> avx2: {}, avx512: {}".format(avx2, avx512))
 
 if __name__=='__main__':
-    build_helper()
+    x86_isa_checker()

@@ -141,7 +141,7 @@ class CxxTorchCudaOptions(CxxTorchOptions):
         super().__init__()
         #_nonduplicate_append(self._cflags, ["DCUDA"])
 
-class CxxBuilder():
+class CxxBuilder(object):
     _compiler = ""
     _cflags_args = ""
     _definations_args = ""
