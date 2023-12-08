@@ -216,8 +216,8 @@ class CxxBuilder(object):
             if _IS_WINDOWS:
                 # https://learn.microsoft.com/en-us/cpp/build/walkthrough-compile-a-c-program-on-the-command-line?view=msvc-1704
                 # https://stackoverflow.com/a/31566153
-                cmd = f"{compiler} {include_dirs_args} {definations_args} {cflags_args} {sources} {ldflags_args} {libraries_args} {libraries_dirs_args} {passthougn_args} /LD /Fe{target_file}"
-                cmd = cmd.replace("\\", "\\\\")
+                cmd = f"{compiler} {include_dirs_args} {definations_args} {cflags_args} {sources} {passthougn_args} /LD /Fe{target_file} /link {ldflags_args} {libraries_args} {libraries_dirs_args}"
+                cmd = cmd.replace("\\", "/")
             else:
                 cmd = f"{compiler} {include_dirs_args} {sources} {definations_args} {cflags_args} {ldflags_args} {libraries_args} {libraries_dirs_args} {passthougn_args} -o {target_file}"
             return cmd
