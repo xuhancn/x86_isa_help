@@ -57,17 +57,16 @@ class BuildOptionsBase(object):
     Acturally, to build a cxx shared library. We just need to select a compiler
     and maintains the suitable args.
     '''
-    _compiler = ""
-    _definations = []
-    _include_dirs = []
-    _cflags = []
-    _ldlags = []
-    _libraries_dirs = []
-    _libraries = []
-    _passthough_args = []
 
     def __init__(self) -> None:
-        pass
+        self._compiler = ""
+        self._definations = []
+        self._include_dirs = []
+        self._cflags = []
+        self._ldlags = []
+        self._libraries_dirs = []
+        self._libraries = []
+        self._passthough_args = []
 
     def get_compiler(self) -> str:
         return self._compiler
@@ -142,24 +141,23 @@ class CxxTorchCudaOptions(CxxTorchOptions):
         #_nonduplicate_append(self._cflags, ["DCUDA"])
 
 class CxxBuilder(object):
-    _compiler = ""
-    _cflags_args = ""
-    _definations_args = ""
-    _include_dirs_args = ""
-    _ldlags_args = ""
-    _libraries_dirs_args = ""
-    _libraries_args = ""
-    _passthough_parameters_args = ""
-
-    _name = ""
-    _sources_args = ""
-    _output_dir = ""
-    _target_file = ""
     def get_shared_lib_ext(self) -> str:
         SHARED_LIB_EXT = '.dll' if _IS_WINDOWS else '.so'
         return SHARED_LIB_EXT    
 
     def __init__(self, name: str, sources: List[str], BuildOption: BuildOptionsBase, output_dir: str = None) -> None:
+        self._compiler = ""
+        self._cflags_args = ""
+        self._definations_args = ""
+        self._include_dirs_args = ""
+        self._ldlags_args = ""
+        self._libraries_dirs_args = ""
+        self._libraries_args = ""
+        self._passthough_parameters_args = ""
+
+        self._output_dir = ""
+        self._target_file = ""
+
         self._name = name
         self._sources_args = " ".join(sources)
         
